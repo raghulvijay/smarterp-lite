@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, Legend,
+  ResponsiveContainer, PieChart, Pie, Cell,
   BarChart, Bar, LabelList,
 } from "recharts";
 
@@ -197,17 +197,23 @@ export default function Dashboard() {
             <div style={{ flex: 1, minHeight: 0 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={orderStatusData} cx="50%" cy="50%" innerRadius={50} outerRadius={76}
+                  <Pie data={orderStatusData} cx="50%" cy="44%" innerRadius={48} outerRadius={72}
                     paddingAngle={3} dataKey="value" style={{ cursor: "pointer" }}
                     onClick={(slice) => { if (slice?.name) navigate(`/orders?status=${slice.name.toLowerCase()}`); }}
                   >
                     {orderStatusData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Pie>
-                  <Legend iconType="circle" iconSize={8}
-                    wrapperStyle={{ fontSize: "0.78rem", color: "var(--text-secondary)" }} />
                   <RTooltip formatter={(v) => [`${v} orders`, ""]} />
                 </PieChart>
               </ResponsiveContainer>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", justifyContent: "center", padding: "4px 0 6px" }}>
+              {orderStatusData.map((entry, i) => (
+                <span key={entry.name} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.76rem", color: "var(--text-secondary)" }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: PIE_COLORS[i % PIE_COLORS.length], flexShrink: 0, display: "inline-block" }} />
+                  {entry.name}
+                </span>
+              ))}
             </div>
             <div className="d-flex justify-content-between pt-2" style={{ borderTop: "1px solid var(--border)" }}>
               {[

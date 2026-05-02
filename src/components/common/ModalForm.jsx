@@ -67,6 +67,37 @@ export default function ModalForm({ show, onHide, onSubmit, title, fields, initi
     const isBad  = !!(touched[field.name] && errors[field.name]);
     const errMsg = touched[field.name] ? errors[field.name] : "";
 
+    if (field.type === "combobox") {
+      return (
+        <Form.Group key={field.name} as={field.col ? Col : undefined} md={field.col}>
+          <Form.Label>
+            {field.label}
+            {field.required && <span style={{ color: "#dc2626" }}> *</span>}
+          </Form.Label>
+          <Form.Control
+            type="text"
+            list={`datalist-${field.name}`}
+            placeholder={field.placeholder || `Select or type ${field.label.toLowerCase()}`}
+            value={val}
+            onChange={(e) => handleChange(field.name, e.target.value)}
+            onBlur={() => handleBlur(field.name)}
+            isInvalid={isBad}
+          />
+          <datalist id={`datalist-${field.name}`}>
+            {field.options?.map((o) => (
+              <option key={o.value} value={o.value} />
+            ))}
+          </datalist>
+          {errMsg && (
+            <div className="field-error">
+              <i className="bi bi-exclamation-circle" />
+              {errMsg}
+            </div>
+          )}
+        </Form.Group>
+      );
+    }
+
     if (field.type === "select") {
       return (
         <Form.Group key={field.name} as={field.col ? Col : undefined} md={field.col}>

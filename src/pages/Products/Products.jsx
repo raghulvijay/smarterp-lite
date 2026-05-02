@@ -30,18 +30,22 @@ import { exportToCsv } from "../../utils/exportCsv";
 import useKeyboardShortcuts from "../../hooks/useKeyboardShortcuts";
 import useFilterPresets     from "../../hooks/useFilterPresets";
 
-const CATEGORIES    = ["All", "Electronics", "Furniture", "Accessories", "Stationery"];
-const FILTER_EXTRAS = ["Needs Restock"];
+const CAT_PALETTE = [
+  { color: "#0891b2", bg: "rgba(8,145,178,0.1)"  },
+  { color: "#7c3aed", bg: "rgba(124,58,237,0.1)" },
+  { color: "#d97706", bg: "rgba(217,119,6,0.1)"  },
+  { color: "#16a34a", bg: "rgba(22,163,74,0.1)"  },
+  { color: "#db2777", bg: "rgba(219,39,119,0.1)" },
+  { color: "#ea580c", bg: "rgba(234,88,12,0.1)"  },
+];
 
-const CAT_META = {
-  All:         { color: "#4f46e5", bg: "rgba(79,70,229,0.1)"  },
-  Electronics: { color: "#0891b2", bg: "rgba(8,145,178,0.1)"  },
-  Furniture:   { color: "#7c3aed", bg: "rgba(124,58,237,0.1)" },
-  Accessories: { color: "#d97706", bg: "rgba(217,119,6,0.1)"  },
-  Stationery:  { color: "#16a34a", bg: "rgba(22,163,74,0.1)"  },
-};
+function getCatMeta(category, allCategories) {
+  if (!category || category === "All") return { color: "#4f46e5", bg: "rgba(79,70,229,0.1)" };
+  const idx = allCategories.indexOf(category);
+  return CAT_PALETTE[idx % CAT_PALETTE.length] ?? CAT_PALETTE[0];
+}
 
-const CATEGORY_OPTIONS = [
+const BASE_CATEGORY_OPTIONS = [
   { value: "Electronics", label: "Electronics" },
   { value: "Furniture",   label: "Furniture"   },
   { value: "Accessories", label: "Accessories" },
@@ -51,17 +55,6 @@ const CATEGORY_OPTIONS = [
 const STATUS_OPTIONS = [
   { value: "Active",   label: "Active"   },
   { value: "Inactive", label: "Inactive" },
-];
-
-const FIELDS = [
-  { name: "name",     label: "Product Name", required: true,  col: 12 },
-  { name: "category", label: "Category",     required: true,  col: 6,
-    type: "select", options: CATEGORY_OPTIONS },
-  { name: "price",    label: "Price ($)",  required: true, type: "number", min: 0.01, step: "0.01", col: 6 },
-  { name: "stock",    label: "Stock Qty",  required: true, type: "number", min: 0,    step: "1",    col: 6 },
-  { name: "minStock", label: "Restock At", required: false, type: "number", min: 1, step: "1", col: 6 },
-  { name: "status",   label: "Status",     required: true,  col: 6,
-    type: "select", options: STATUS_OPTIONS },
 ];
 
 export default function Products() {
@@ -183,7 +176,7 @@ export default function Products() {
   }, [isAdmin, selectedIds, products, editProduct, showToast]);
 
   const bulkActions = isAdmin ? [
-    ...CATEGORY_OPTIONS.map((c) => ({ label: `→ ${c.label}`, icon: "bi-tag", onClick: () => bulkCategoryUpdate(c.value) })),
+    ...categoryOptions.map((c) => ({ label: `→ ${c.label}`, icon: "bi-tag", onClick: () => bulkCategoryUpdate(c.value) })),
     { label: "Export",        icon: "bi-download",  onClick: bulkExport },
     { label: "Delete",        icon: "bi-trash3",    onClick: bulkDelete, danger: true },
   ] : [
@@ -243,6 +236,28 @@ export default function Products() {
   const lowStockCount  = products.filter((p) => p.stock > 0 && p.stock <= 10).length;
   const outCount       = products.filter((p) => p.stock === 0).length;
   const restockCount   = products.filter((p) => p.stock <= (p.minStock ?? 10)).length;
+
+  // Dynamic categories from actual product data + base options merged
+  const allCategories = useMemo(() => {
+    const fromProducts = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+    const base = BASE_CATEGORY_OPTIONS.map((o) => o.value);
+    return [...new Set([...base, ...fromProducts])];
+  }, [products]);
+
+  const categoryOptions = useMemo(() =>
+    allCategories.map((c) => ({ value: c, label: c })),
+  [allCategories]);
+
+  const FIELDS = [
+    { name: "name",     label: "Product Name", required: true,  col: 12 },
+    { name: "category", label: "Category",     required: true,  col: 6,
+      type: "combobox", options: categoryOptions, placeholder: "Select or type a category" },
+    { name: "price",    label: "Price ($)",  required: true, type: "number", min: 0.01, step: "0.01", col: 6 },
+    { name: "stock",    label: "Stock Qty",  required: true, type: "number", min: 0,    step: "1",    col: 6 },
+    { name: "minStock", label: "Restock At", required: false, type: "number", min: 1, step: "1", col: 6 },
+    { name: "status",   label: "Status",     required: true,  col: 6,
+      type: "select", options: STATUS_OPTIONS },
+  ];
 
   if (loading) return <SkeletonTable preset="products" rows={8} />;
   if (error)   return <ErrorMessage message={error} onRetry={refetch} />;
@@ -304,9 +319,9 @@ export default function Products() {
 
       {/* ── Category pills + Restock pill + Save Filter ─── */}
       <div className="d-flex gap-2 mb-3 flex-wrap align-items-center">
-        {CATEGORIES.map((cat) => {
+        {["All", ...allCategories].map((cat) => {
           const count    = cat === "All" ? products.length : products.filter((p) => p.category === cat).length;
-          const meta     = CAT_META[cat];
+          const meta     = getCatMeta(cat, allCategories);
           const isActive = activeCategory === cat && !restockFilter;
           return (
             <button
@@ -448,7 +463,7 @@ export default function Products() {
           <Column dataField="id" caption="ID" width={80} alignment="center" allowEditing={false} fixed fixedPosition="left" />
           <Column dataField="name" caption="Product" minWidth={140} />
           <Column dataField="category" caption="Category" width={130}>
-            <Lookup dataSource={CATEGORY_OPTIONS} valueExpr="value" displayExpr="label" />
+            <Lookup dataSource={categoryOptions} valueExpr="value" displayExpr="label" />
           </Column>
           <Column
             dataField="price" caption="Price" width={120} alignment="right"

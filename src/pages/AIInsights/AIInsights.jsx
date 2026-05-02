@@ -7,9 +7,8 @@ import ErrorMessage from "../../components/common/ErrorMessage";
 import { useApp } from "../../context/AppContext";
 import { useAuth } from "../../context/AuthContext";
 import { useAuditLog } from "../../context/AuditLogContext";
-import { generateAIInsights, getAnomalyRootCause, generatePurchaseDraft, AI_MODE_LABEL, IS_GEMINI } from "../../api/aiApi";
+import { generateAIInsights, generatePurchaseDraft, AI_MODE_LABEL, IS_GEMINI } from "../../api/aiApi";
 import { generateInsights, getInsightSummary } from "../../utils/aiInsights";
-import { detectAnomalies } from "../../utils/anomalyDetector";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
@@ -189,107 +188,6 @@ function AuditLogTab({ log, clearLog, isAdmin }) {
   );
 }
 
-const ANOMALY_PRIORITY_META = {
-  critical: { border: "rgba(220,38,38,0.35)", bg: "rgba(220,38,38,0.07)", dot: "#dc2626" },
-  high:     { border: "rgba(249,115,22,0.35)", bg: "rgba(249,115,22,0.07)", dot: "#f97316" },
-  medium:   { border: "rgba(234,179,8,0.35)",  bg: "rgba(234,179,8,0.07)",  dot: "#eab308" },
-};
-
-function AnomalyTab({ orders, products }) {
-  const anomalies = useMemo(() => detectAnomalies(orders, products), [orders, products]);
-  const [analyses, setAnalyses]   = useState({});
-  const [loading,  setLoading]    = useState({});
-  const [expanded, setExpanded]   = useState({});
-
-  async function loadAnalysis(anomaly) {
-    if (analyses[anomaly.id] || loading[anomaly.id]) return;
-    setLoading((p) => ({ ...p, [anomaly.id]: true }));
-    try {
-      const { analysis } = await getAnomalyRootCause({ anomaly, orders, products });
-      setAnalyses((p) => ({ ...p, [anomaly.id]: analysis }));
-    } finally {
-      setLoading((p) => ({ ...p, [anomaly.id]: false }));
-    }
-  }
-
-  if (anomalies.length === 0) {
-    return (
-      <div className="text-center py-5" style={{ color: "var(--text-muted)" }}>
-        <i className="bi bi-shield-check" style={{ fontSize: "2.5rem", display: "block", marginBottom: 12, color: "#10b981" }} />
-        <p className="mb-1" style={{ fontWeight: 600, fontSize: "1rem" }}>No anomalies detected</p>
-        <p style={{ fontSize: "0.875rem" }}>All KPIs are within normal thresholds.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="d-flex flex-column gap-3">
-      {anomalies.map((a) => {
-        const meta = ANOMALY_PRIORITY_META[a.priority] ?? ANOMALY_PRIORITY_META.medium;
-        const isExp = expanded[a.id];
-        return (
-          <div key={a.id} style={{ border: `1.5px solid ${meta.border}`, background: meta.bg, borderRadius: 12, overflow: "hidden" }}>
-            <div
-              style={{ padding: "14px 18px", cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 14 }}
-              onClick={() => setExpanded((p) => ({ ...p, [a.id]: !p[a.id] }))}
-            >
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: meta.dot, flexShrink: 0, marginTop: 5 }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
-                  <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: "var(--text-primary)" }}>
-                    <i className={`bi ${a.icon} me-2`} style={{ color: meta.dot }} />
-                    {a.title}
-                  </span>
-                  <span className={`priority-badge ${a.priority}`}>
-                    {a.priority.toUpperCase()}
-                  </span>
-                  <span style={{ background: "var(--table-stripe)", color: "var(--text-muted)", borderRadius: 6, padding: "2px 8px", fontSize: "0.72rem", fontWeight: 600, marginLeft: "auto" }}>
-                    {a.metric}
-                  </span>
-                </div>
-                <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--text-secondary)" }}>{a.description}</p>
-              </div>
-              <i className={`bi bi-chevron-${isExp ? "up" : "down"}`} style={{ color: "var(--text-muted)", flexShrink: 0, marginTop: 2 }} />
-            </div>
-
-            {isExp && (
-              <div style={{ padding: "0 18px 16px 42px", borderTop: `1px solid ${meta.border}` }}>
-                <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: "12px 14px", marginTop: 12 }}>
-                  <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
-                    Why this matters
-                  </div>
-                  <p style={{ margin: 0, fontSize: "0.8375rem", color: "var(--text-secondary)" }}>{a.why}</p>
-                </div>
-
-                {analyses[a.id] && (
-                  <div style={{ background: "var(--brand-soft)", border: "1px solid var(--border)", borderRadius: 8, padding: "12px 14px", marginTop: 10 }}>
-                    <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
-                      <i className="bi bi-stars me-1" />AI Root Cause Analysis
-                    </div>
-                    <p style={{ margin: 0, fontSize: "0.8375rem", color: "var(--text-secondary)" }}>{analyses[a.id]}</p>
-                  </div>
-                )}
-
-                <button
-                  className="btn btn-sm mt-3"
-                  onClick={() => loadAnalysis(a)}
-                  disabled={loading[a.id] || !!analyses[a.id]}
-                  style={{ border: "1.5px solid #7c3aed", color: "#7c3aed", background: "var(--bg-card)", borderRadius: 8, fontWeight: 600, fontSize: "0.8rem", display: "flex", alignItems: "center", gap: 6 }}
-                >
-                  {loading[a.id]
-                    ? <><span className="spinner-border spinner-border-sm" /> Analyzing…</>
-                    : analyses[a.id]
-                      ? <><i className="bi bi-check2" /> Analysis complete</>
-                      : <><i className="bi bi-stars" /> {IS_GEMINI ? "Get AI Root Cause Analysis" : "Get Analysis (Mock)"}</>}
-                </button>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 function RestockTab({ orders, products }) {
   const [poDraft,    setPoDraft]    = useState(null);
@@ -533,11 +431,10 @@ export default function AIInsights() {
       {/* ── Tab bar ───────────────────────────────────────────────────────── */}
       <div className="d-flex gap-1 mb-4 flex-wrap" style={{ borderBottom: "1px solid var(--border)", paddingBottom: 0 }}>
         {[
-          { key: "insights",  label: "AI Insights",         icon: "bi-stars"          },
+          { key: "insights", label: "AI Insights",     icon: "bi-stars"        },
           ...(isAdmin ? [
-            { key: "anomalies", label: "Anomaly Detection", icon: "bi-exclamation-diamond" },
-            { key: "restock",   label: "Restock Planner",   icon: "bi-box-seam"        },
-            { key: "log",       label: "Activity Log",      icon: "bi-clock-history"   },
+            { key: "restock", label: "Restock Planner", icon: "bi-box-seam"    },
+            { key: "log",     label: "Activity Log",    icon: "bi-clock-history" },
           ] : []),
         ].map((tab) => (
           <button
@@ -566,22 +463,6 @@ export default function AIInsights() {
       {/* ── Activity Log tab ──────────────────────────────────────────────── */}
       {activeTab === "log" && isAdmin && (
         <AuditLogTab log={log} clearLog={clearLog} isAdmin={isAdmin} />
-      )}
-
-      {/* ── Anomaly Detection tab ─────────────────────────────────────────── */}
-      {activeTab === "anomalies" && isAdmin && (
-        <div>
-          <div className="d-flex align-items-center gap-3 mb-4">
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: "linear-gradient(135deg,#dc2626,#f97316)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <i className="bi bi-exclamation-diamond" style={{ color: "white", fontSize: "1.2rem" }} />
-            </div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: "1rem", color: "var(--text-primary)" }}>AI Anomaly Detection</div>
-              <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Rule-based analysis of 4 key business indicators</div>
-            </div>
-          </div>
-          <AnomalyTab orders={orders} products={products} />
-        </div>
       )}
 
       {/* ── Restock Planner tab ───────────────────────────────────────────── */}

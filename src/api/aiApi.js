@@ -182,19 +182,6 @@ In 2-3 sentences, explain what the trend suggests, any risks, and one action rec
   };
 }
 
-export async function getAnomalyRootCause({ anomaly, orders, products }) {
-  if (IS_GEMINI) {
-    const context = `Anomaly: ${anomaly.title}\nDescription: ${anomaly.description}\nERP context: ${orders.length} total orders, ${products.length} products, cancellation rate ${(orders.filter((o) => o.status === "Cancelled").length / orders.length * 100).toFixed(1)}%`;
-    const prompt = `${context}
-Provide a root cause analysis in 2-3 sentences and suggest 2 concrete corrective actions. Plain text only.`;
-    return { analysis: (await callGemini(prompt)).trim() };
-  }
-  await delay(500);
-  return {
-    analysis: `Root cause: ${anomaly.why} Recommended actions: 1) Review the affected records in detail to confirm the pattern. 2) Set up automated alerts to catch this threshold being crossed in future reporting periods.`,
-  };
-}
-
 export async function generatePurchaseDraft({ restockItems }) {
   if (IS_GEMINI) {
     const itemList = restockItems.map((r) =>

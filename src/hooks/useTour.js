@@ -43,14 +43,6 @@ const TOUR_STEPS = [
     },
   },
   {
-    element: "[aria-label='Toggle theme'], .theme-toggle[title*='theme'], .theme-toggle[title*='Theme']",
-    popover: {
-      title: "Dark Mode",
-      description: "Switch between light and dark themes — your preference is saved automatically.",
-      side: "bottom", align: "end",
-    },
-  },
-  {
     element: "[data-tour='search-btn'], [title*='Search']",
     popover: {
       title: "Global Search (Ctrl+K)",
@@ -86,7 +78,7 @@ const TOUR_STEPS = [
     element: "[data-tour='ai-link'], .sidebar-link[href='/ai-insights']",
     popover: {
       title: "AI Insights",
-      description: "Business intelligence powered by Gemini AI — anomaly detection, revenue forecasts, restock planner, and audit log.",
+      description: "Business intelligence powered by Gemini AI — executive summary, recommendations, restock planner, and audit log.",
       side: "right", align: "start",
     },
   },
