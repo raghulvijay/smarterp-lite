@@ -15,8 +15,7 @@ const TECH_STACK = [
   { name: "DevExtreme",      why: "Enterprise DataGrid with Excel features" },
   { name: "Recharts",        why: "Declarative React chart components"      },
   { name: "@dnd-kit",        why: "Accessible drag-and-drop for Kanban"     },
-  { name: "react-grid-layout", why: "Drag-to-rearrange dashboard widgets"  },
-  { name: "driver.js",       why: "Lightweight zero-dependency tour"        },
+{ name: "driver.js",       why: "Lightweight zero-dependency tour"        },
   { name: "Gemini AI",       why: "Natural-language ERP insights"          },
 ];
 

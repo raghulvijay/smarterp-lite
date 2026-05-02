@@ -20,7 +20,7 @@ function CurrencySelector() {
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <button
-        className="theme-toggle"
+        className="icon-btn"
         title="Currency"
         onClick={() => setOpen((o) => !o)}
         style={{ fontSize: "0.8rem", fontWeight: 700, gap: 3, width: "auto", padding: "0 9px" }}
@@ -111,7 +111,7 @@ function NotificationsDropdown({ products, orders }) {
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <button
-        className="theme-toggle"
+        className="icon-btn"
         title="Notifications"
         style={{ position: "relative" }}
         onClick={() => setOpen((o) => !o)}
@@ -248,7 +248,7 @@ export default function Header({ onToggleSidebar, sidebarOpen, onOpenSearch, onO
         {onOpenSearch && (
           <button
             data-tour="search-btn"
-            className="theme-toggle d-none d-sm-flex"
+            className="icon-btn d-none d-sm-flex"
             title="Search (Ctrl+K)"
             onClick={onOpenSearch}
             aria-label="Open global search"
@@ -266,7 +266,7 @@ export default function Header({ onToggleSidebar, sidebarOpen, onOpenSearch, onO
         {onOpenExport && (
           <button
             data-tour="export-btn"
-            className="theme-toggle d-none d-sm-flex"
+            className="icon-btn d-none d-sm-flex"
             title="Export Center"
             onClick={onOpenExport}
             aria-label="Open export center"
