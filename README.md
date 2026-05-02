@@ -291,4 +291,43 @@ Currency selection is persisted to localStorage and syncs between the header sel
 
 ---
 
+---
+
+## Changelog
+
+### What Was Removed
+
+These features were present in earlier versions and have been fully removed from the codebase.
+
+| Removed Feature | What it was | Why removed |
+|---|---|---|
+| **Dark Mode / Theme Toggle** | `ThemeContext.jsx`, `Ctrl+D` shortcut, and all `[data-theme="dark"]` CSS overrides | Added unnecessary complexity and CSS conflicts with DevExtreme and Bootstrap |
+| **Drag-to-Rearrange Dashboard** | `react-grid-layout` widget grid on the Dashboard | Replaced by a fixed, clean layout — the dependency added 300KB with no UX benefit |
+| **Anomaly Detection tab** | Third AI Insights tab that flagged statistical outliers in order data | Underdeveloped and unreliable with mock data; removed to keep AI Insights focused |
+| **Revenue Forecasting** | Linear regression projection chart on the AI Insights page | Forecast accuracy was misleading with in-memory demo data; removed cleanly |
+| **RoleSwitcher component** | UI element to switch roles without logging out | Bypassed auth logic and was only a dev convenience; removed for production correctness |
+| **`ThemeContext.jsx`** | React context that managed light/dark theme state | No longer needed after dark mode removal |
+| **`anomalyDetector.js`** | Utility that computed Z-score anomalies on order values | Removed with the Anomaly Detection tab |
+| **`forecast.js`** | Linear regression utility for revenue projections | Removed with the Revenue Forecasting feature |
+
+---
+
+### What Was Added or Fixed
+
+| Change | Description |
+|---|---|
+| **Products page crash fix** | Resolved a JavaScript temporal dead zone error — `categoryOptions` was referenced before its `useMemo` declaration, crashing the Products page on every load |
+| **`.icon-btn` CSS class** | Replaced the removed `.theme-toggle` class (which was reused as a generic icon button style) with a properly named `.icon-btn` class used by the Currency, Notifications, Search, and Export header buttons |
+| **Service worker cache v2** | Bumped the PWA cache name from `smarterp-v1` to `smarterp-v2` — fixes stale browser caching where old browsers served outdated JS/CSS after deployments |
+| **Multi-Currency Display** | Added USD / EUR / INR / GBP switching in the header and Settings page, with live conversion across all price displays |
+| **Smart Export Center** | Added CSV, JSON, and HTML report export with a column chooser modal |
+| **Floating AI Chat Widget** | Added a persistent chat bubble for natural-language questions about ERP data |
+| **Per-product restock threshold** | Added `minStock` field per product; Needs Restock filter and notifications use this instead of a hardcoded value |
+| **Filter presets** | Save and reload named filter configurations on Products and Orders pages |
+| **Custom category support** | Category field on the Add/Edit Product modal is a free-text combobox — type a new category or pick an existing one |
+| **Onboarding tour** | 11-step driver.js walkthrough auto-starts on first login and can be relaunched from the user menu |
+| **Audit log** | All CREATE / UPDATE / DELETE actions are logged with user, timestamp, and entity details; visible on the AI Insights → Activity Log tab |
+
+---
+
 > Built as a showcase of production-grade React patterns. DevExtreme DataGrid shows a trial banner in non-commercial builds.
