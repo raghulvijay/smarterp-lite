@@ -175,6 +175,17 @@ export default function Products() {
     }
   }, [isAdmin, selectedIds, products, editProduct, showToast]);
 
+  // Dynamic categories from actual product data + base options merged
+  const allCategories = useMemo(() => {
+    const fromProducts = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+    const base = BASE_CATEGORY_OPTIONS.map((o) => o.value);
+    return [...new Set([...base, ...fromProducts])];
+  }, [products]);
+
+  const categoryOptions = useMemo(() =>
+    allCategories.map((c) => ({ value: c, label: c })),
+  [allCategories]);
+
   const bulkActions = isAdmin ? [
     ...categoryOptions.map((c) => ({ label: `→ ${c.label}`, icon: "bi-tag", onClick: () => bulkCategoryUpdate(c.value) })),
     { label: "Export",        icon: "bi-download",  onClick: bulkExport },
@@ -236,17 +247,6 @@ export default function Products() {
   const lowStockCount  = products.filter((p) => p.stock > 0 && p.stock <= 10).length;
   const outCount       = products.filter((p) => p.stock === 0).length;
   const restockCount   = products.filter((p) => p.stock <= (p.minStock ?? 10)).length;
-
-  // Dynamic categories from actual product data + base options merged
-  const allCategories = useMemo(() => {
-    const fromProducts = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
-    const base = BASE_CATEGORY_OPTIONS.map((o) => o.value);
-    return [...new Set([...base, ...fromProducts])];
-  }, [products]);
-
-  const categoryOptions = useMemo(() =>
-    allCategories.map((c) => ({ value: c, label: c })),
-  [allCategories]);
 
   const FIELDS = [
     { name: "name",     label: "Product Name", required: true,  col: 12 },
