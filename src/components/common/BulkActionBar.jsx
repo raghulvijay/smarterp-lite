@@ -10,6 +10,7 @@ export default function BulkActionBar({ count, onClear, actions }) {
       boxShadow: "0 8px 32px rgba(0,0,0,0.28)",
       zIndex: 1050, animation: "fadeUp 0.2s ease",
       whiteSpace: "nowrap",
+      maxWidth: "calc(100vw - 32px)", overflowX: "auto",
     }}>
       <span style={{ fontSize: "0.875rem", fontWeight: 600, marginRight: 4 }}>
         {count} selected

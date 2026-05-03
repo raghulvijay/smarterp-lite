@@ -33,7 +33,7 @@ function Section({ title, icon, children }) {
 
 function Row({ label, hint, children }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
       <div>
         <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--text-primary)" }}>{label}</div>
         {hint && <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: 1 }}>{hint}</div>}
@@ -141,7 +141,7 @@ export default function Settings() {
     border: "1.5px solid var(--border)", borderRadius: 8,
     padding: "6px 12px", background: "var(--bg-card)",
     color: "var(--text-primary)", fontSize: "0.875rem", outline: "none",
-    width: 200,
+    width: "min(200px, 100%)",
   };
 
   return (
@@ -208,7 +208,7 @@ export default function Settings() {
             { label: "Reset Dashboard Layout",   icon: "bi-layout-wtf", color: "#d97706", onClick: resetDashboard, hint: "Restores default widget arrangement" },
             { label: "Clear All Saved Filters",  icon: "bi-funnel",     color: "#6b7280", onClick: clearFilters,   hint: "Removes saved filter presets from all pages" },
           ].map((action) => (
-            <div key={action.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+            <div key={action.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
               <div>
                 <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--text-primary)" }}>{action.label}</div>
                 <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>{action.hint}</div>

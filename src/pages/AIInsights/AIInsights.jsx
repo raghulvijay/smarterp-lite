@@ -429,7 +429,7 @@ export default function AIInsights() {
       />
 
       {/* ── Tab bar ───────────────────────────────────────────────────────── */}
-      <div className="d-flex gap-1 mb-4 flex-wrap" style={{ borderBottom: "1px solid var(--border)", paddingBottom: 0 }}>
+      <div className="d-flex gap-1 mb-4" style={{ borderBottom: "1px solid var(--border)", paddingBottom: 0, overflowX: "auto", flexWrap: "nowrap" }}>
         {[
           { key: "insights", label: "AI Insights",     icon: "bi-stars"        },
           ...(isAdmin ? [

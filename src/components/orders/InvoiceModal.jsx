@@ -33,7 +33,7 @@ export default function InvoiceModal({ show, onHide, order }) {
           <i className="bi bi-receipt me-2" style={{ color: "#4f46e5" }} />
           Invoice — {order.id}
         </Modal.Title>
-        <div className="d-flex gap-2 ms-auto">
+        <div className="d-flex gap-2 ms-auto flex-wrap">
           <button
             className="btn btn-sm"
             onClick={handlePrint}
@@ -142,7 +142,7 @@ export default function InvoiceModal({ show, onHide, order }) {
             </div>
 
             {/* Line items */}
-            <div style={{ border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden", marginBottom: 20 }}>
+            <div style={{ border: "1px solid var(--border)", borderRadius: 10, overflowX: "auto", marginBottom: 20 }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
                 <thead>
                   <tr style={{ background: "var(--table-stripe)" }}>
@@ -172,7 +172,7 @@ export default function InvoiceModal({ show, onHide, order }) {
 
             {/* Totals */}
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <div style={{ width: 270 }}>
+              <div style={{ width: "100%", maxWidth: 270 }}>
                 {[
                   { label: "Subtotal",                               value: fmt(subtotal) },
                   { label: `GST (${(GST_RATE * 100).toFixed(0)}%)`, value: fmt(gst) },

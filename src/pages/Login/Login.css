@@ -133,6 +133,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 8px;
   padding: 8px 6px;
   border-bottom: 1px solid var(--border);
   border-radius: 6px;

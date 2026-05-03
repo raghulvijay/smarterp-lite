@@ -1103,10 +1103,13 @@ h1, h2, h3, h4, h5, h6 {
     padding-bottom: 4px;
   }
 
-  /* Notification dropdown: full width on mobile */
+  /* Notification dropdown: fixed to viewport on mobile */
   .notif-dropdown-panel {
-    width: calc(100vw - 32px) !important;
-    right: -60px !important;
+    position: fixed !important;
+    top: calc(var(--header-h) + 4px) !important;
+    left: 16px !important;
+    right: 16px !important;
+    width: auto !important;
   }
 
   /* Chart title responsive */

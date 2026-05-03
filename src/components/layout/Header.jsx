@@ -128,7 +128,7 @@ function NotificationsDropdown({ products, orders }) {
       </button>
 
       {open && (
-        <div style={{
+        <div className="notif-dropdown-panel" style={{
           position: "absolute", top: "calc(100% + 8px)", right: 0,
           width: 320, background: "var(--bg-card)", border: "1px solid var(--border)",
           borderRadius: 12, boxShadow: "var(--shadow-lg)", zIndex: 2000,
@@ -324,7 +324,7 @@ export default function Header({ onToggleSidebar, sidebarOpen, onOpenSearch, onO
               <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--text-primary)" }}>
                 {name}
               </div>
-              <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 2 }}>
+              <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 168 }}>
                 {currentUser?.email}
               </div>
               <span style={{
