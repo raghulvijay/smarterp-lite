@@ -368,9 +368,15 @@ export default function Orders() {
               <Selection mode="multiple" showCheckBoxesMode="always" />
               <SearchPanel visible placeholder="Search records..." width={240} />
               <HeaderFilter visible />
-              <Scrolling mode="virtual" rowRenderingMode="virtual" />
-              <Paging defaultPageSize={20} />
-              <Pager showPageSizeSelector allowedPageSizes={[5, 10, 15, 25]} showInfo infoText="Showing {0}-{1} of {2} records" />
+              <Scrolling mode="standard" />
+              <Paging defaultPageSize={5} />
+              <Pager
+                showPageSizeSelector
+                allowedPageSizes={[5, 8, 15, "all"]}
+                showInfo
+                showNavigationButtons
+                infoText="Showing {0}-{1} of {2} records"
+              />
               <ColumnChooser enabled mode="select" />
               <ColumnFixing enabled />
               <StateStoring enabled type="localStorage" storageKey="erp-orders-grid" />
