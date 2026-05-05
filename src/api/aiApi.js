@@ -163,7 +163,11 @@ Only set keys relevant to the query. Return ONLY valid JSON, no explanation.`;
   for (const c of cats) {
     if (q.includes(c)) { filter.category = c; break; }
   }
-  filter.searchTerm = query;
+  // Only use the full query as a text search when no structured filter was detected,
+  // otherwise the searchTerm check would over-filter and return zero results.
+  if (!filter.category && filter.maxPrice == null && filter.minPrice == null && !filter.stockStatus) {
+    filter.searchTerm = query;
+  }
   return filter;
 }
 

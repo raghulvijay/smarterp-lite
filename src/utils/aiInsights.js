@@ -357,6 +357,10 @@ export function generateMockAIAnswer({ question, products, orders, users }) {
   });
   const topCat = Object.entries(categoryRevenue).sort((a, b) => b[1] - a[1])[0];
 
+  if (q.includes("model") || q.includes("who are you") || q.includes("what are you") || q.includes("which ai") || q.includes("are you") || q.includes("your name") || q.includes("hello") || q.includes("hi") || q.includes("hey") || q.includes("greet")) {
+    return { answer: "Hi! I'm the SmartERP AI Assistant running in Mock AI mode — a built-in rule-based engine that works fully offline with no API key needed. To switch to real AI (Google Gemini), set VITE_GEMINI_API_KEY in your .env file. Ask me anything about your inventory, orders, revenue, or users!" };
+  }
+
   if (q.includes("today") || q.includes("focus") || q.includes("priority") || q.includes("start") || q.includes("should i")) {
     return urgentParts.length > 0
       ? { answer: `Your top priorities today are to ${urgentParts.join(" and ")}. These are the highest-impact items for revenue protection. After that, review low-stock products to prevent the next stockout.` }
